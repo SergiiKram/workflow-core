@@ -40,6 +40,67 @@ namespace WorkflowCore.UnitTests
         }
 
         [Fact]
+        public void CreateNewWorkflow_should_create_duplicates_without_reference()
+        {
+            var workflow = new WorkflowInstance
+            {
+                Data = new { Value1 = 7 },
+                Description = "My Description",
+                Status = WorkflowStatus.Runnable,
+                NextExecution = 0,
+                Version = 1,
+                WorkflowDefinitionId = "My Workflow"
+            };
+            workflow.ExecutionPointers.Add(new ExecutionPointer
+            {
+                Id = Guid.NewGuid().ToString(),
+                Active = true,
+                StepId = 0
+            });
+
+            var workflowId1 = Subject.CreateNewWorkflow(workflow).Result;
+
+            workflow.Id = null;
+
+            var workflowId2 = Subject.CreateNewWorkflow(workflow).Result;
+
+            workflowId1.Should().NotBeNull();
+            workflowId2.Should().NotBeNull();
+            workflowId2.Should().NotBe(workflowId1);
+        }
+
+        [Fact]
+        public void CreateNewWorkflow_with_duplicate_reference_should_fail()
+        {
+            var workflow = new WorkflowInstance
+            {
+                Data = new { Value1 = 7 },
+                Description = "My Description",
+                Status = WorkflowStatus.Runnable,
+                NextExecution = 0,
+                Version = 1,
+                WorkflowDefinitionId = "My Workflow",
+                Reference = ""
+            };
+            workflow.ExecutionPointers.Add(new ExecutionPointer
+            {
+                Id = Guid.NewGuid().ToString(),
+                Active = true,
+                StepId = 0
+            });
+
+            Func<Task> action1 = () => Subject.CreateNewWorkflow(workflow);
+
+            action1.ShouldNotThrow();
+
+            workflow.Id = null;
+
+            Func<Task> action2 = () => Subject.CreateNewWorkflow(workflow);
+
+            action2.ShouldThrow<Exception>();
+        }
+
+        [Fact]
         public void GetWorkflowInstance_should_retrieve_workflow()
         {
             var workflow = new WorkflowInstance
@@ -50,7 +111,7 @@ namespace WorkflowCore.UnitTests
                 NextExecution = 0,
                 Version = 1,
                 WorkflowDefinitionId = "My Workflow",
-                Reference = "My Reference"
+                Reference = Guid.NewGuid().ToString()
             };
             workflow.ExecutionPointers.Add(new ExecutionPointer
             {
@@ -80,7 +141,7 @@ namespace WorkflowCore.UnitTests
                 NextExecution = 0,
                 Version = 1,
                 WorkflowDefinitionId = "My Workflow",
-                Reference = "My Reference"
+                Reference = Guid.NewGuid().ToString()
             };
             workflow01.ExecutionPointers.Add(new ExecutionPointer
             {
@@ -100,7 +161,7 @@ namespace WorkflowCore.UnitTests
                 NextExecution = 0,
                 Version = 1,
                 WorkflowDefinitionId = "My Workflow",
-                Reference = "My Reference"
+                Reference = Guid.NewGuid().ToString()
             };
             workflow02.ExecutionPointers.Add(new ExecutionPointer
             {
@@ -120,7 +181,7 @@ namespace WorkflowCore.UnitTests
                 NextExecution = 0,
                 Version = 1,
                 WorkflowDefinitionId = "My Workflow",
-                Reference = "My Reference"
+                Reference = Guid.NewGuid().ToString()
             };
             workflow03.ExecutionPointers.Add(new ExecutionPointer
             {
@@ -164,7 +225,7 @@ namespace WorkflowCore.UnitTests
                 Version = 1,
                 WorkflowDefinitionId = "My Workflow",
                 CreateTime = new DateTime(2000, 1, 1).ToUniversalTime(),
-                Reference = "My Reference"
+                Reference = Guid.NewGuid().ToString()
             };
             oldWorkflow.ExecutionPointers.Add(new ExecutionPointer
             {
