@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WorkflowCore.Interface;
 using WorkflowCore.Persistence.EntityFramework.Models;
 using WorkflowCore.Models;
 using WorkflowCore.Persistence.EntityFramework.Interfaces;
@@ -11,7 +10,7 @@ using System.Threading;
 
 namespace WorkflowCore.Persistence.EntityFramework.Services
 {
-    public class EntityFrameworkPersistenceProvider : IPersistenceProvider
+    public class EntityFrameworkPersistenceProvider : IExtendedPersistenceProvider
     {
         private readonly bool _canCreateDB;
         private readonly bool _canMigrateDB;
@@ -106,6 +105,23 @@ namespace WorkflowCore.Persistence.EntityFramework.Services
                     .ThenInclude(ep => ep.ExtensionAttributes)
                     .Include(wf => wf.ExecutionPointers)
                     .FirstAsync(x => x.InstanceId == uid, cancellationToken);
+
+                if (raw == null)
+                    return null;
+
+                return raw.ToWorkflowInstance();
+            }
+        }
+
+        public async Task<WorkflowInstance> GetWorkflowInstanceByReference(string reference, CancellationToken cancellationToken = default)
+        {
+            using (var db = ConstructDbContext())
+            {
+                var raw = await db.Set<PersistedWorkflow>()
+                    .Include(wf => wf.ExecutionPointers)
+                    .ThenInclude(ep => ep.ExtensionAttributes)
+                    .Include(wf => wf.ExecutionPointers)
+                    .FirstAsync(x => x.Reference == reference, cancellationToken);
 
                 if (raw == null)
                     return null;
