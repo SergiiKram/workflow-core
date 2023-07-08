@@ -1,6 +1,48 @@
-# Workflow Core
+# Idempotent Workflow Core
 
-[![Build status](https://ci.appveyor.com/api/projects/status/xnby6p5v4ur04u76?svg=true)](https://ci.appveyor.com/project/danielgerlag/workflow-core)
+[![Build and Tests](https://github.com/SergiiKram/workflow-core/actions/workflows/dotnet.yml/badge.svg)](https://github.com/SergiiKram/workflow-core/actions/workflows/dotnet.yml)
+[![CodeQL](https://github.com/SergiiKram/workflow-core/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/SergiiKram/workflow-core/actions/workflows/codeql-analysis.yml)
+[![Publish Nuget](https://github.com/SergiiKram/workflow-core/actions/workflows/nuget.yml/badge.svg)](https://github.com/SergiiKram/workflow-core/actions/workflows/nuget.yml)
+
+This is a fork of the https://github.com/danielgerlag/workflow-core with idempotent workflow instance creation.
+
+The `Reference` field is used as an idempotency key.
+
+So now you can safely retry workflow creation and have an exactly-once guarantee.
+Also, in scenarios where you create a workflow to process document, user, external event, etc.,
+you can derive 'reference' from these entities and later find the matching workflow if you failed to persist the returned workflow id the first time.
+
+**Example:**
+```xml
+<PackageReference Include="SergiiKram.WorkflowCore.Persistence.PostgreSQL.Idempotent" Version="3.9.0" />
+```
+
+```cs
+/// <summary>
+/// Trigger <c>HelloWorldWorkflow</c> manually.
+/// </summary>
+/// <returns></returns>
+[HttpPost("hello-world")]
+public async Task<IActionResult> HelloWorld(string reference)
+{
+    try
+    {
+        var id = await _workflowController.StartWorkflow(HelloWorldWorkflow.WorkflowId, reference: reference);
+
+        return Ok(new { id = id });
+    }
+    catch (WorkflowExistsException)
+    {
+        var workflowInstance = await _workflowStore.GetWorkflowInstanceByReference(reference);
+
+        return Ok(new { id = workflowInstance.Id });
+    }
+}
+```
+
+Only PostgreSQL is supported for now.
+
+# Workflow Core
 
 Workflow Core is a light weight embeddable workflow engine targeting .NET Standard.  Think: long running processes with multiple tasks that need to track state.  It supports pluggable persistence and concurrency providers to allow for multi-node clusters.
 

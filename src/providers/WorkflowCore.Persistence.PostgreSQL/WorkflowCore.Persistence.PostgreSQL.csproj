@@ -1,20 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <AssemblyTitle>Workflow Core PostgreSQL Persistence Provider</AssemblyTitle>
-    <Authors>Daniel Gerlag</Authors>
+    <AssemblyTitle>Workflow Core Idempotent PostgreSQL Persistence Provider</AssemblyTitle>
+    <Authors>DanielGerlag,sergiikram</Authors>
     <TargetFrameworks>netstandard2.1;net6.0</TargetFrameworks>
     <AssemblyName>WorkflowCore.Persistence.PostgreSQL</AssemblyName>
-    <PackageId>WorkflowCore.Persistence.PostgreSQL</PackageId>
-    <PackageTags>workflow;.NET;Core;state machine;WorkflowCore;PostgreSQL</PackageTags>
-    <PackageProjectUrl>https://github.com/danielgerlag/workflow-core</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/danielgerlag/workflow-core/blob/master/LICENSE.md</PackageLicenseUrl>
+    <PackageId>SergiiKram.WorkflowCore.Persistence.PostgreSQL.Idempotent</PackageId>
+    <PackageTags>idempotent;workflow;.NET;Core;state machine;WorkflowCore;PostgreSQL</PackageTags>
+    <PackageProjectUrl>https://github.com/SergiiKram/workflow-core</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/SergiiKram/workflow-core/blob/idempotent-workflow-start/LICENSE.md</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/danielgerlag/workflow-core.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/SergiiKram/workflow-core</RepositoryUrl>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <Description>Provides support to persist workflows running on Workflow Core to a PostgreSQL database.</Description>
+    <Description>Provides idempotency support while persisting workflows running on Workflow Core to a PostgreSQL database.</Description>
   </PropertyGroup>
 
   <ItemGroup>
@@ -35,19 +35,15 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
-    <PackageReference Include="Npgsql" Version="5.0.14" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.1">
+    <PackageReference Include="Npgsql" Version="5.0.10" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.10">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.1">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.10">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="1.0.0-msbuild3-final" />
   </ItemGroup>
 
 </Project>
