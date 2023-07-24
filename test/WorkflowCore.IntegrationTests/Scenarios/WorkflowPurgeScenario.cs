@@ -58,7 +58,6 @@ namespace WorkflowCore.IntegrationTests.Scenarios
 
             await WorkflowPurger.PurgeWorkflows(WorkflowStatus.Complete, DateTime.UtcNow);
             await EventsPurger.PurgeEvents(DateTime.UtcNow);
-            await EventsPurger.PurgeEvents(DateTime.UtcNow);
 
             var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => GetWorkflowInstance(workflowId));
             exception.Message.Should().Contain("Sequence contains no elements");
