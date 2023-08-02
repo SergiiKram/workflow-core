@@ -2,11 +2,11 @@
 
   <PropertyGroup>
     <AssemblyTitle>Workflow Core</AssemblyTitle>
-    <Authors>Daniel Gerlag</Authors>
+    <Authors>Daniel Gerlag,sergiikram</Authors>
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>WorkflowCore</AssemblyName>
-    <PackageId>WorkflowCore</PackageId>
-    <PackageTags>workflow;.NET;Core;state machine</PackageTags>
+    <PackageId>SergiiKram.WorkflowCore</PackageId>
+    <PackageTags>idempotent;workflow;.NET;Core;state machine</PackageTags>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>

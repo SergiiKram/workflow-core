@@ -3,6 +3,9 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageLicenseUrl>https://github.com/danielgerlag/workflow-core/blob/master/LICENSE.md</PackageLicenseUrl>
+	<Authors>Daniel Gerlag,sergiikram</Authors>
+    <PackageId>SergiiKram.WorkflowCore.Providers.Redis</PackageId>
+    <PackageTags>idempotent;workflow;.NET;Core;state machine;redis</PackageTags>
     <RepositoryUrl>https://github.com/danielgerlag/workflow-core.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/danielgerlag/workflow-core</PackageProjectUrl>
