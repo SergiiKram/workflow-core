@@ -33,6 +33,7 @@ namespace WorkflowCore.Persistence.EntityFramework.Services
                 var persistable = subscription.ToPersistable();
                 var result = db.Set<PersistedSubscription>().Add(persistable);
                 await db.SaveChangesAsync(cancellationToken);
+                subscription.Id = result.Entity.SubscriptionId.ToString();
                 return subscription.Id;
             }
         }
@@ -45,6 +46,7 @@ namespace WorkflowCore.Persistence.EntityFramework.Services
                 var persistable = workflow.ToPersistable();
                 var result = db.Set<PersistedWorkflow>().Add(persistable);
                 await db.SaveChangesAsync(cancellationToken);
+                workflow.Id = result.Entity.InstanceId.ToString();
                 return workflow.Id;
             }
         }
@@ -187,7 +189,8 @@ namespace WorkflowCore.Persistence.EntityFramework.Services
                 {
                     subscription.Id = Guid.NewGuid().ToString();
                     var subscriptionPersistable = subscription.ToPersistable();
-                    db.Set<PersistedSubscription>().Add(subscriptionPersistable);
+                    var result = db.Set<PersistedSubscription>().Add(subscriptionPersistable);
+                    subscription.Id = result.Entity.SubscriptionId.ToString();
                 }
 
                 await db.SaveChangesAsync(cancellationToken);
@@ -244,7 +247,7 @@ namespace WorkflowCore.Persistence.EntityFramework.Services
                 var persistable = newEvent.ToPersistable();
                 var result = db.Set<PersistedEvent>().Add(persistable);
                 await db.SaveChangesAsync(cancellationToken);
-                return newEvent.Id;
+                return result.Entity.EventId.ToString();
             }
         }
 

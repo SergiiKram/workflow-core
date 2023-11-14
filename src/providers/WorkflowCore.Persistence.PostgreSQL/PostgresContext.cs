@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Humanizer.Inflections;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Npgsql;
 using System;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 using WorkflowCore.Persistence.EntityFramework.Exceptions;
 using WorkflowCore.Persistence.EntityFramework.Models;
 using WorkflowCore.Persistence.EntityFramework.Services;
+using WorkflowCore.Persistence.PostgreSQL.Interceptors;
 
 namespace WorkflowCore.Persistence.PostgreSQL
 {
@@ -26,18 +28,26 @@ namespace WorkflowCore.Persistence.PostgreSQL
         {
             base.OnConfiguring(optionsBuilder);
             optionsBuilder.UseNpgsql(_connectionString);
+            optionsBuilder.AddInterceptors(new SetDefaultGuidValueInterceptor());
         }
 
         protected override void ConfigureSubscriptionStorage(EntityTypeBuilder<PersistedSubscription> builder)
         {
             builder.ToTable("Subscription", _schemaName);
             builder.Property(x => x.PersistenceId).ValueGeneratedOnAdd();
+            builder.Property(x => x.SubscriptionId)
+                .ValueGeneratedOnAdd()
+                .HasDefaultValueSql("uuid_generate_v1");
         }
 
         protected override void ConfigureWorkflowStorage(EntityTypeBuilder<PersistedWorkflow> builder)
         {
             builder.ToTable("Workflow", _schemaName);
             builder.Property(x => x.PersistenceId).ValueGeneratedOnAdd();
+            builder.Property(x => x.InstanceId)
+                .ValueGeneratedOnAdd()
+                .HasDefaultValueSql("uuid_generate_v1");
+
         }
                 
         protected override void ConfigureExecutionPointerStorage(EntityTypeBuilder<PersistedExecutionPointer> builder)
@@ -62,6 +72,9 @@ namespace WorkflowCore.Persistence.PostgreSQL
         {
             builder.ToTable("Event", _schemaName);
             builder.Property(x => x.PersistenceId).ValueGeneratedOnAdd();
+            builder.Property(x => x.EventId)
+                .ValueGeneratedOnAdd()
+                .HasDefaultValueSql("uuid_generate_v1");
         }
 
         protected override void ConfigureScheduledCommandStorage(EntityTypeBuilder<PersistedScheduledCommand> builder)
