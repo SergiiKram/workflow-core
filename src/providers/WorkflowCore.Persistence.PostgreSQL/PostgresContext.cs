@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using WorkflowCore.Persistence.EntityFramework.Exceptions;
 using WorkflowCore.Persistence.EntityFramework.Models;
 using WorkflowCore.Persistence.EntityFramework.Services;
-using WorkflowCore.Persistence.PostgreSQL.Interceptors;
 
 namespace WorkflowCore.Persistence.PostgreSQL
 {
@@ -28,7 +27,6 @@ namespace WorkflowCore.Persistence.PostgreSQL
         {
             base.OnConfiguring(optionsBuilder);
             optionsBuilder.UseNpgsql(_connectionString);
-            optionsBuilder.AddInterceptors(new SetDefaultGuidValueInterceptor());
         }
 
         protected override void ConfigureSubscriptionStorage(EntityTypeBuilder<PersistedSubscription> builder)
