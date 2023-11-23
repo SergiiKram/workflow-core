@@ -37,6 +37,7 @@ namespace WorkflowCore.UnitTests
 
             workflowId.Should().NotBeNull();
             workflow.Id.Should().NotBeNull();
+            Guid.Parse(workflowId).Should().NotBe(Guid.Empty);
         }
 
         [Fact]
@@ -310,6 +311,10 @@ namespace WorkflowCore.UnitTests
             {
                 subscriptions = Subject.GetSubscriptions(pointer.EventName, workflowId, DateTime.UtcNow).Result.ToList();
                 subscriptions.Should().HaveCount(1);
+                foreach (var subscription in subscriptions)
+                {
+                    Guid.Parse(subscription.Id).Should().NotBe(Guid.Empty);
+                }
             }
         }
 
@@ -353,6 +358,24 @@ namespace WorkflowCore.UnitTests
             {
                 action.ShouldNotThrow<InvalidOperationException>();
             });
+        }
+
+        [Fact]
+        public void CreateNewEvent()
+        {
+            var @event = new Event
+            {
+                EventName = "Event",
+                EventKey = "EventKey",
+                EventData = "EventData",
+                EventTime = DateTime.UtcNow,
+                IsProcessed = true
+            };
+
+            var eventId = Subject.CreateEvent(@event).Result;
+
+            eventId.Should().NotBeNull();
+            Guid.Parse(eventId).Should().NotBe(Guid.Empty);
         }
     }
 
