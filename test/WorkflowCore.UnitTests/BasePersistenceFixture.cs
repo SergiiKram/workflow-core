@@ -37,7 +37,7 @@ namespace WorkflowCore.UnitTests
 
             workflowId.Should().NotBeNull();
             workflow.Id.Should().NotBeNull();
-            Guid.Parse(workflowId).Should().NotBe(Guid.Empty);
+            Guid.Parse(workflowId).Should().NotBe(Guid.Empty); 
         }
 
         [Fact]
