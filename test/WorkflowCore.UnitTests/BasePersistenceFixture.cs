@@ -37,7 +37,7 @@ namespace WorkflowCore.UnitTests
 
             workflowId.Should().NotBeNull();
             workflow.Id.Should().NotBeNull();
-            Guid.Parse(workflowId).Should().NotBe(Guid.Empty); 
+            Guid.Parse(workflowId).Should().NotBeEmpty(); 
         }
 
         [Fact]
@@ -313,7 +313,7 @@ namespace WorkflowCore.UnitTests
                 subscriptions.Should().HaveCount(1);
                 foreach (var subscription in subscriptions)
                 {
-                    Guid.Parse(subscription.Id).Should().NotBe(Guid.Empty);
+                    Guid.Parse(subscription.Id).Should().NotBeEmpty();
                 }
             }
         }
@@ -375,7 +375,7 @@ namespace WorkflowCore.UnitTests
             var eventId = Subject.CreateEvent(@event).Result;
 
             eventId.Should().NotBeNull();
-            Guid.Parse(eventId).Should().NotBe(Guid.Empty);
+            Guid.Parse(eventId).Should().NotBeEmpty();
         }
     }
 
