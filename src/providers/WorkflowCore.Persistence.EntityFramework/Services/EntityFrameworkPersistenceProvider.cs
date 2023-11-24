@@ -241,7 +241,7 @@ namespace WorkflowCore.Persistence.EntityFramework.Services
         {
             using (var db = ConstructDbContext())
             {
-                newEvent.Id = Guid.NewGuid().ToString();
+                newEvent.Id = NewId.NextGuid().ToString();
                 var persistable = newEvent.ToPersistable();
                 var result = db.Set<PersistedEvent>().Add(persistable);
                 await db.SaveChangesAsync(cancellationToken);
