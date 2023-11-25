@@ -5,10 +5,10 @@
     <PackageLicenseUrl>https://github.com/SergiiKram/workflow-core/blob/idempotent-workflow-start/LICENSE.md</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/SergiiKram/workflow-core</RepositoryUrl>
-    <Version>3.9.0.4</Version>
-    <AssemblyVersion>3.9.0.4</AssemblyVersion>
-    <FileVersion>3.9.0.4</FileVersion>
+    <Version>4.0.0-alpha.1</Version>
+    <AssemblyVersion>4.0.0.0</AssemblyVersion>
+    <FileVersion>4.0.0.0</FileVersion>
     <PackageIconUrl>https://github.com/SergiiKram/workflow-core/raw/idempotent-workflow-start/src/logo.png</PackageIconUrl>
-    <PackageVersion>3.9.0.4</PackageVersion>
+    <PackageVersion>4.0.0-alpha.1</PackageVersion>
   </PropertyGroup>
 </Project>
