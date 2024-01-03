@@ -7,7 +7,7 @@ namespace WorkflowCore.Models
         public int BatchSize { get; } = 100;
         public int DeleteCommandTimeoutSeconds { get; } = 120;
 
-        public WorkflowsPurgerOptions(int batchSize, int deleteCommandTimeoutSeconds = 129)
+        public WorkflowsPurgerOptions(int batchSize, int deleteCommandTimeoutSeconds = 120)
         {
             if (batchSize < 0)
                 throw new ArgumentOutOfRangeException("Batch size shoud be greater than 0");
