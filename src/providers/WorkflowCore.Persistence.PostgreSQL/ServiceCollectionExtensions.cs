@@ -17,7 +17,7 @@ namespace Microsoft.Extensions.DependencyInjection
             }
 
             options.UsePersistence(sp => GetPersistenceFactory(connectionString, canCreateDB, canMigrateDB, schemaName));
-            options.Services.AddTransient<IWorkflowPurger>(sp => new WorkflowPurger(new PostgresContextFactory(connectionString, schemaName)));
+            options.Services.AddTransient<IWorkflowPurger>(sp => new WorkflowPurger(new PostgresContextFactory(connectionString, schemaName), options.WorkflowsPurgerOptions));
             options.Services.AddTransient<IEventsPurger>(sp => new EventsPurger(new PostgresContextFactory(connectionString, schemaName), options.EventsPurgerOptions));
             options.Services.AddTransient<IExtendedPersistenceProvider>(sp => GetPersistenceFactory(connectionString, canCreateDB, canMigrateDB, schemaName));
             return options;

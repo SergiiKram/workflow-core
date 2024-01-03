@@ -12,7 +12,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public static WorkflowOptions UseMySQL(this WorkflowOptions options, string connectionString, bool canCreateDB, bool canMigrateDB, Action<MySqlDbContextOptionsBuilder> mysqlOptionsAction = null)
         {
             options.UsePersistence(sp => new EntityFrameworkPersistenceProvider(new MysqlContextFactory(connectionString, mysqlOptionsAction), canCreateDB, canMigrateDB));
-            options.Services.AddTransient<IWorkflowPurger>(sp => new WorkflowPurger(new MysqlContextFactory(connectionString, mysqlOptionsAction)));
+            options.Services.AddTransient<IWorkflowPurger>(sp => new WorkflowPurger(new MysqlContextFactory(connectionString, mysqlOptionsAction), options.WorkflowsPurgerOptions));
             options.Services.AddTransient<IEventsPurger>(sp => new EventsPurger(new MysqlContextFactory(connectionString, mysqlOptionsAction), options.EventsPurgerOptions));
             return options;
         }

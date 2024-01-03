@@ -13,33 +13,57 @@ namespace WorkflowCore.Persistence.EntityFramework.Services
     public class WorkflowPurger : IWorkflowPurger
     {
         private readonly IWorkflowDbContextFactory _contextFactory;
+        private readonly WorkflowsPurgerOptions _options;
 
-        public WorkflowPurger(IWorkflowDbContextFactory contextFactory)
+        public WorkflowPurger(IWorkflowDbContextFactory contextFactory, WorkflowsPurgerOptions options)
         {
             _contextFactory = contextFactory;
+            _options = options;
         }
-        
+
         public async Task PurgeWorkflows(WorkflowStatus status, DateTime olderThan, CancellationToken cancellationToken = default)
         {
             var olderThanUtc = olderThan.ToUniversalTime();
             using (var db = ConstructDbContext())
             {
-                var workflows = await db.Set<PersistedWorkflow>().Where(x => x.Status == status && x.CompleteTime < olderThanUtc).ToListAsync(cancellationToken);
-                foreach (var wf in workflows)
-                {
-                    foreach (var pointer in wf.ExecutionPointers)
+                int deleteEvents = _options.BatchSize;
+                db.Database.SetCommandTimeout(_options.DeleteCommandTimeoutSeconds);
+
+                #if NET6_0_OR_GREATER
+                    while(deleteEvents != 0)
                     {
-                        foreach (var extAttr in pointer.ExtensionAttributes)
+                        deleteEvents = await db.Set<PersistedWorkflow>()
+                            .Where(x => x.Status == status && x.CompleteTime < olderThanUtc)
+                            .Take(_options.BatchSize)
+                            .ExecuteDeleteAsync(cancellationToken);
+                    }
+                #else
+                while (deleteEvents != 0)
+                    {
+                        var workflows = db.Set<PersistedWorkflow>()
+                            .Where(x => x.Status == status && x.CompleteTime < olderThanUtc)
+                            .Take(_options.BatchSize);
+
+                        deleteEvents = await workflows.CountAsync();
+
+                        foreach (var wf in workflows)
                         {
-                            db.Remove(extAttr);
+                            foreach (var pointer in wf.ExecutionPointers)
+                            {
+                                foreach (var extAttr in pointer.ExtensionAttributes)
+                                {
+                                    db.Remove(extAttr);
+                                }
+
+                                db.Remove(pointer);
+                            }
+                            db.Remove(wf);
                         }
 
-                        db.Remove(pointer);
+                        await db.SaveChangesAsync(cancellationToken);
                     }
-                    db.Remove(wf);
-                }
 
-                await db.SaveChangesAsync(cancellationToken);
+                #endif
             }
         }
         

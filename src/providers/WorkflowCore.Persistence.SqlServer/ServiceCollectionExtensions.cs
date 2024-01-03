@@ -12,7 +12,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public static WorkflowOptions UseSqlServer(this WorkflowOptions options, string connectionString, bool canCreateDB, bool canMigrateDB, Action<DbConnection> initAction = null)
         {
             options.UsePersistence(sp => new EntityFrameworkPersistenceProvider(new SqlContextFactory(connectionString, initAction), canCreateDB, canMigrateDB));
-            options.Services.AddTransient<IWorkflowPurger>(sp => new WorkflowPurger(new SqlContextFactory(connectionString, initAction)));
+            options.Services.AddTransient<IWorkflowPurger>(sp => new WorkflowPurger(new SqlContextFactory(connectionString, initAction), options.WorkflowsPurgerOptions));
             options.Services.AddTransient<IEventsPurger>(sp => new EventsPurger(new SqlContextFactory(connectionString, initAction), options.EventsPurgerOptions));
             return options;
         }
