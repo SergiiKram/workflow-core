@@ -44,8 +44,6 @@ namespace WorkflowCore.Persistence.EntityFramework.Services
                             .Where(x => x.Status == status && x.CompleteTime < olderThanUtc)
                             .Take(_options.BatchSize);
 
-                        deleteEvents = await workflows.CountAsync();
-
                         foreach (var wf in workflows)
                         {
                             foreach (var pointer in wf.ExecutionPointers)
@@ -60,7 +58,7 @@ namespace WorkflowCore.Persistence.EntityFramework.Services
                             db.Remove(wf);
                         }
 
-                        await db.SaveChangesAsync(cancellationToken);
+                        deleteEvents = await db.SaveChangesAsync(cancellationToken);
                     }
 
                 #endif
