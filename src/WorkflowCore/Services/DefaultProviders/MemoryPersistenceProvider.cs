@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using WorkflowCore.Exceptions;
 using WorkflowCore.Interface;
 using WorkflowCore.Models;
 
@@ -30,6 +31,11 @@ namespace WorkflowCore.Services
         {
             lock (_instances)
             {
+                if (workflow.Reference != null && _instances.Any(x => x.Reference == workflow.Reference))
+                {
+                    throw new WorkflowExistsException();
+                }
+
                 workflow.Id = Guid.NewGuid().ToString();
                 _instances.Add(workflow);
                 return workflow.Id;

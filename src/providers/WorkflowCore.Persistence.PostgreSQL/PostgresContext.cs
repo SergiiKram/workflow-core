@@ -4,7 +4,7 @@ using Npgsql;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using WorkflowCore.Persistence.EntityFramework.Exceptions;
+using WorkflowCore.Exceptions;
 using WorkflowCore.Persistence.EntityFramework.Models;
 using WorkflowCore.Persistence.EntityFramework.Services;
 

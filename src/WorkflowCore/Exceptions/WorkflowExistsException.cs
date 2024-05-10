@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace WorkflowCore.Persistence.EntityFramework.Exceptions
+namespace WorkflowCore.Exceptions
 {
     public class WorkflowExistsException : Exception
     {

@@ -2,10 +2,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
+using WorkflowCore.Exceptions;
 using WorkflowCore.IntegrationTests.Scenarios;
 using WorkflowCore.Interface;
 using WorkflowCore.Models;
-using WorkflowCore.Persistence.EntityFramework.Exceptions;
 using WorkflowCore.Persistence.EntityFramework.Interfaces;
 using WorkflowCore.Testing;
 using Xunit;
