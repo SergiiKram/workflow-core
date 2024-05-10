@@ -25,6 +25,8 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
+    - name: Unit Tests
+      run: dotnet test test/WorkflowCore.UnitTests --no-build --verbosity normal -p:ParallelizeTestCollections=false
     - name: Integration Tests
       run: dotnet test test/WorkflowCore.IntegrationTests --no-build --verbosity normal -p:ParallelizeTestCollections=false
     - name: PostgreSQL Tests
