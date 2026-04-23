@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 using WorkflowCore.Interface;
 using WorkflowCore.Models;
@@ -17,15 +18,59 @@ namespace WorkflowCore.Services.DefinitionStorage
     public class DefinitionLoader : IDefinitionLoader
     {
         private readonly IWorkflowRegistry _registry;
+        private readonly ITypeResolver _typeResolver;
 
-        public DefinitionLoader(IWorkflowRegistry registry)
+        // ParsingConfig to allow access to commonly used .NET methods like object.Equals
+        private static readonly ParsingConfig ParsingConfig = new ParsingConfig
+        {
+            AllowNewToEvaluateAnyType = false,
+            AreContextKeywordsEnabled = true
+        };
+
+        // Transform expressions to be compatible with System.Linq.Dynamic.Core 1.6.0+
+        private static string TransformExpression(string expression)
+        {
+            if (string.IsNullOrEmpty(expression))
+                return expression;
+
+            // Transform object.Equals(a, b) to Convert.ToBoolean(a) == Convert.ToBoolean(b)
+            // This is a simple regex replacement for the common pattern
+            var objectEqualsPattern = @"object\.Equals\s*\(\s*([^,]+)\s*,\s*([^)]+)\s*\)";
+            var transformed = Regex.Replace(expression, objectEqualsPattern,
+                match =>
+                {
+                    var arg1 = match.Groups[1].Value.Trim();
+                    var arg2 = match.Groups[2].Value.Trim();
+
+                    // If arg2 is a boolean literal, convert arg1 to boolean and compare
+                    if (arg2 == "true" || arg2 == "false")
+                    {
+                        return $"Convert.ToBoolean({arg1}) == {arg2}";
+                    }
+                    // Otherwise, convert both to strings for comparison
+                    return $"Convert.ToString({arg1}) == Convert.ToString({arg2})";
+                });
+
+            return transformed;
+        }
+
+        public DefinitionLoader(IWorkflowRegistry registry, ITypeResolver typeResolver)
         {
             _registry = registry;
+            _typeResolver = typeResolver;
         }
 
         public WorkflowDefinition LoadDefinition(string source, Func<string, DefinitionSourceV1> deserializer)
         {
+            if (string.IsNullOrWhiteSpace(source))
+                throw new ArgumentNullException(nameof(source));
+            if (deserializer == null)
+                throw new ArgumentNullException(nameof(deserializer));
+
             var sourceObj = deserializer(source);
+            if (sourceObj == null)
+                throw new InvalidOperationException("Deserialization returned null.");
+
             var def = Convert(sourceObj);
             _registry.RegisterWorkflow(def);
             return def;
@@ -73,11 +118,17 @@ namespace WorkflowCore.Services.DefinitionStorage
                 {
                     containerType = typeof(WorkflowStep<>).MakeGenericType(stepType);
 
-                    targetStep = (containerType.GetConstructor(new Type[] { }).Invoke(null) as WorkflowStep);
+                    var ctor = containerType.GetConstructor(new Type[] { });
+                    if (ctor == null)
+                        throw new InvalidOperationException($"Type '{containerType.FullName}' does not have a parameterless constructor.");
+                    targetStep = ctor.Invoke(null) as WorkflowStep;
                 }
                 else
                 {
-                    targetStep = stepType.GetConstructor(new Type[] { }).Invoke(null) as WorkflowStep;
+                    var ctor = stepType.GetConstructor(new Type[] { });
+                    if (ctor == null)
+                        throw new InvalidOperationException($"Type '{stepType.FullName}' does not have a parameterless constructor.");
+                    targetStep = ctor.Invoke(null) as WorkflowStep;
                     if (targetStep != null)
                         stepType = targetStep.BodyType;
                 }
@@ -85,15 +136,25 @@ namespace WorkflowCore.Services.DefinitionStorage
                 if (nextStep.Saga)
                 {
                     containerType = typeof(SagaContainer<>).MakeGenericType(stepType);
-                    targetStep = (containerType.GetConstructor(new Type[] { }).Invoke(null) as WorkflowStep);
+                    var sagaCtor = containerType.GetConstructor(new Type[] { });
+                    if (sagaCtor == null)
+                        throw new InvalidOperationException($"Type '{containerType.FullName}' does not have a parameterless constructor.");
+                    targetStep = sagaCtor.Invoke(null) as WorkflowStep;
                 }
 
                 if (!string.IsNullOrEmpty(nextStep.CancelCondition))
                 {
                     var cancelExprType = typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(dataType, typeof(bool)));
                     var dataParameter = Expression.Parameter(dataType, "data");
-                    var cancelExpr = DynamicExpressionParser.ParseLambda(new[] { dataParameter }, typeof(bool), nextStep.CancelCondition);
-                    targetStep.CancelCondition = cancelExpr;
+                    try
+                    {
+                        var cancelExpr = DynamicExpressionParser.ParseLambda(ParsingConfig, false, new[] { dataParameter }, typeof(bool), TransformExpression(nextStep.CancelCondition));
+                        targetStep.CancelCondition = cancelExpr;
+                    }
+                    catch (Exception ex) when (ex is System.Linq.Dynamic.Core.Exceptions.ParseException || ex is InvalidOperationException)
+                    {
+                        throw new WorkflowDefinitionLoadException($"Error parsing cancel condition expression '{nextStep.CancelCondition}' for step '{nextStep.Id}': {ex.Message}", ex);
+                    }
                 }
 
                 targetStep.Id = i;
@@ -215,15 +276,24 @@ namespace WorkflowCore.Services.DefinitionStorage
             foreach (var output in source.Outputs)
             {
                 var stepParameter = Expression.Parameter(stepType, "step");
-                var sourceExpr = DynamicExpressionParser.ParseLambda(new[] { stepParameter }, typeof(object), output.Value);
+                LambdaExpression sourceExpr;
+                try
+                {
+                    sourceExpr = DynamicExpressionParser.ParseLambda(ParsingConfig, false, new[] { stepParameter }, typeof(object), TransformExpression(output.Value));
+                }
+                catch (Exception ex) when (ex is System.Linq.Dynamic.Core.Exceptions.ParseException || ex is InvalidOperationException)
+                {
+                    throw new WorkflowDefinitionLoadException($"Error parsing output expression '{output.Value}': {ex.Message}", ex);
+                }
 
                 var dataParameter = Expression.Parameter(dataType, "data");
 
 
-                if(output.Key.Contains(".") || output.Key.Contains("["))
+                if (output.Key.Contains(".") || output.Key.Contains("["))
                 {
                     AttachNestedOutput(output, step, source, sourceExpr, dataParameter);
-                }else
+                }
+                else
                 {
                     AttachDirectlyOutput(output, step, dataType, sourceExpr, dataParameter);
                 }
@@ -250,7 +320,15 @@ namespace WorkflowCore.Services.DefinitionStorage
 
                 Action<IStepBody, object> acn = (pStep, pData) =>
                 {
-                    object resolvedValue = sourceExpr.Compile().DynamicInvoke(pStep); ;
+                    object resolvedValue;
+                    try
+                    {
+                        resolvedValue = sourceExpr.Compile().DynamicInvoke(pStep);
+                    }
+                    catch (TargetInvocationException ex)
+                    {
+                        throw new InvalidOperationException($"Error evaluating expression for output property.", ex.InnerException ?? ex);
+                    }
                     propertyInfo.SetValue(pData, resolvedValue, new object[] { output.Key });
                 };
 
@@ -259,11 +337,11 @@ namespace WorkflowCore.Services.DefinitionStorage
 
         }
 
-        private void AttachNestedOutput( KeyValuePair<string, string> output, WorkflowStep step, StepSourceV1 source, LambdaExpression sourceExpr, ParameterExpression dataParameter)
+        private void AttachNestedOutput(KeyValuePair<string, string> output, WorkflowStep step, StepSourceV1 source, LambdaExpression sourceExpr, ParameterExpression dataParameter)
         {
             PropertyInfo propertyInfo = null;
             String[] paths = output.Key.Split('.');
-         
+
             Expression targetProperty = dataParameter;
 
             bool hasAddOutput = false;
@@ -302,8 +380,24 @@ namespace WorkflowCore.Services.DefinitionStorage
                     Action<IStepBody, object> acn = (pStep, pData) =>
                     {
                         var targetExpr = Expression.Lambda(memberExpression, dataParameter);
-                        object data = targetExpr.Compile().DynamicInvoke(pData);
-                        object resolvedValue = sourceExpr.Compile().DynamicInvoke(pStep); ;
+                        object data;
+                        try
+                        {
+                            data = targetExpr.Compile().DynamicInvoke(pData);
+                        }
+                        catch (TargetInvocationException ex)
+                        {
+                            throw new InvalidOperationException($"Error evaluating expression for nested output property.", ex.InnerException ?? ex);
+                        }
+                        object resolvedValue;
+                        try
+                        {
+                            resolvedValue = sourceExpr.Compile().DynamicInvoke(pStep);
+                        }
+                        catch (TargetInvocationException ex)
+                        {
+                            throw new InvalidOperationException($"Error evaluating expression for nested output property.", ex.InnerException ?? ex);
+                        }
                         propertyInfo.SetValue(data, resolvedValue, new object[] { items[1] });
                     };
 
@@ -316,7 +410,7 @@ namespace WorkflowCore.Services.DefinitionStorage
                     {
                         targetProperty = Expression.Property(targetProperty, propertyName);
                     }
-                    catch
+                    catch (ArgumentException)
                     {
                         targetProperty = null;
                         break;
@@ -341,7 +435,15 @@ namespace WorkflowCore.Services.DefinitionStorage
 
             foreach (var nextStep in source.SelectNextStep)
             {
-                var sourceDelegate = DynamicExpressionParser.ParseLambda(new[] { dataParameter, outcomeParameter }, typeof(object), nextStep.Value).Compile();
+                Delegate sourceDelegate;
+                try
+                {
+                    sourceDelegate = DynamicExpressionParser.ParseLambda(ParsingConfig, false, new[] { dataParameter, outcomeParameter }, typeof(object), TransformExpression(nextStep.Value)).Compile();
+                }
+                catch (Exception ex) when (ex is System.Linq.Dynamic.Core.Exceptions.ParseException || ex is InvalidOperationException)
+                {
+                    throw new WorkflowDefinitionLoadException($"Error parsing select next step expression '{nextStep.Value}': {ex.Message}", ex);
+                }
                 Expression<Func<object, object, bool>> sourceExpr = (data, outcome) => System.Convert.ToBoolean(sourceDelegate.DynamicInvoke(data, outcome));
                 step.Outcomes.Add(new ExpressionOutcome<object>(sourceExpr)
                 {
@@ -352,19 +454,44 @@ namespace WorkflowCore.Services.DefinitionStorage
 
         private Type FindType(string name)
         {
-            return Type.GetType(name, true, true);
+            return _typeResolver.FindType(name);
         }
 
         private static Action<IStepBody, object, IStepExecutionContext> BuildScalarInputAction(KeyValuePair<string, object> input, ParameterExpression dataParameter, ParameterExpression contextParameter, ParameterExpression environmentVarsParameter, PropertyInfo stepProperty)
         {
             var expr = System.Convert.ToString(input.Value);
-            var sourceExpr = DynamicExpressionParser.ParseLambda(new[] { dataParameter, contextParameter, environmentVarsParameter }, typeof(object), expr);
+            LambdaExpression sourceExpr;
+            try
+            {
+                sourceExpr = DynamicExpressionParser.ParseLambda(ParsingConfig, false, new[] { dataParameter, contextParameter, environmentVarsParameter }, typeof(object), TransformExpression(expr));
+            }
+            catch (Exception ex) when (ex is System.Linq.Dynamic.Core.Exceptions.ParseException || ex is InvalidOperationException)
+            {
+                throw new WorkflowDefinitionLoadException($"Error parsing input expression '{expr}' for property '{input.Key}': {ex.Message}", ex);
+            }
 
             void acn(IStepBody pStep, object pData, IStepExecutionContext pContext)
             {
-                object resolvedValue = sourceExpr.Compile().DynamicInvoke(pData, pContext, Environment.GetEnvironmentVariables());
+                object resolvedValue;
+                try
+                {
+                    resolvedValue = sourceExpr.Compile().DynamicInvoke(pData, pContext, Environment.GetEnvironmentVariables());
+                }
+                catch (TargetInvocationException ex)
+                {
+                    throw new InvalidOperationException($"Error evaluating expression for step property.", ex.InnerException ?? ex);
+                }
                 if (stepProperty.PropertyType.IsEnum)
-                    stepProperty.SetValue(pStep, Enum.Parse(stepProperty.PropertyType, (string)resolvedValue, true));
+                {
+                    try
+                    {
+                        stepProperty.SetValue(pStep, Enum.Parse(stepProperty.PropertyType, resolvedValue?.ToString() ?? string.Empty, true));
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        throw new InvalidOperationException($"Invalid enum value '{resolvedValue}' for property '{stepProperty.Name}' of type '{stepProperty.PropertyType.Name}'.", ex);
+                    }
+                }
                 else
                 {
                     if ((resolvedValue != null) && (stepProperty.PropertyType.IsAssignableFrom(resolvedValue.GetType())))
@@ -391,8 +518,16 @@ namespace WorkflowCore.Services.DefinitionStorage
                     {
                         if (prop.Name.StartsWith("@"))
                         {
-                            var sourceExpr = DynamicExpressionParser.ParseLambda(new[] { dataParameter, contextParameter, environmentVarsParameter }, typeof(object), prop.Value.ToString());
-                            object resolvedValue = sourceExpr.Compile().DynamicInvoke(pData, pContext, Environment.GetEnvironmentVariables());
+                            var sourceExpr = DynamicExpressionParser.ParseLambda(ParsingConfig, false, new[] { dataParameter, contextParameter, environmentVarsParameter }, typeof(object), TransformExpression(prop.Value.ToString()));
+                            object resolvedValue;
+                            try
+                            {
+                                resolvedValue = sourceExpr.Compile().DynamicInvoke(pData, pContext, Environment.GetEnvironmentVariables());
+                            }
+                            catch (TargetInvocationException ex)
+                            {
+                                throw new InvalidOperationException($"Error evaluating expression for step property.", ex.InnerException ?? ex);
+                            }
                             subobj.Remove(prop.Name);
                             subobj.Add(prop.Name.TrimStart('@'), JToken.FromObject(resolvedValue));
                         }
