@@ -15,16 +15,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\WorkflowCore\WorkflowCore.csproj" />
-    <ProjectReference Include="..\..\providers\WorkflowCore.Persistence.MongoDB\WorkflowCore.Persistence.MongoDB.csproj" />
     <ProjectReference Include="..\..\extensions\WorkflowCore.WebAPI\WorkflowCore.WebAPI.csproj" />
     <ProjectReference Include="..\WorkflowCore.Sample04\WorkflowCore.Sample04.csproj" />
     <ProjectReference Include="..\WorkflowCore.Sample03\WorkflowCore.Sample03.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Diagnostics" Version="2.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Server.IISIntegration" Version="2.2.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.2.0" />
   </ItemGroup>
 
 </Project>

@@ -10,7 +10,7 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
@@ -18,8 +18,6 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: |
-          3.1.x
-          6.0.x
           8.0.x
           10.0.x
     - name: Restore dependencies
@@ -32,3 +30,5 @@ jobs:
       run: dotnet test test/WorkflowCore.IntegrationTests --no-build --verbosity normal -p:ParallelizeTestCollections=false
     - name: PostgreSQL Tests
       run: dotnet test test/WorkflowCore.Tests.PostgreSQL --no-build --verbosity normal -p:ParallelizeTestCollections=false
+    - name: Redis Tests
+      run: dotnet test test/WorkflowCore.Tests.Redis --no-build --verbosity normal -p:ParallelizeTestCollections=false

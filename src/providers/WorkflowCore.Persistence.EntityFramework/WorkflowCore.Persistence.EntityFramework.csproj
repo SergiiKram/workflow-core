@@ -3,7 +3,7 @@
   <PropertyGroup>
     <AssemblyTitle>Workflow Core EntityFramework Core Persistence Provider</AssemblyTitle>
     <Authors>DanielGerlag,sergiikram</Authors>
-    <TargetFrameworks>netstandard2.1;net6.0;net8.0;net10.0</TargetFrameworks>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
     <AssemblyName>WorkflowCore.Persistence.EntityFramework</AssemblyName>
     <PackageId>SergiiKram.WorkflowCore.Persistence.EntityFramework</PackageId>
     <PackageTags>idempotent;workflow;.NET;Core;state machine;WorkflowCore;EntityFramework;EntityFrameworkCore</PackageTags>
@@ -21,10 +21,6 @@
     <ProjectReference Include="..\..\WorkflowCore\WorkflowCore.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="7.*" />
-  </ItemGroup>
-
   <ItemGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.*" />
   </ItemGroup>
@@ -33,13 +29,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.*" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.2" />
-  </ItemGroup>
-
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
 
 </Project>

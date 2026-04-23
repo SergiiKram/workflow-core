@@ -49,13 +49,13 @@ namespace WorkflowCore.UnitTests.Services
 
 
         [Fact(DisplayName = "RunPreMiddleware should run nothing when no middleware")]
-        public void RunPreMiddleware_should_run_nothing_when_no_middleware()
+        public async Task RunPreMiddleware_should_run_nothing_when_no_middleware()
         {
             // Act
             Func<Task> action = async () => await Runner.RunPreMiddleware(Workflow, Definition);
 
             // Assert
-            action.ShouldNotThrow();
+            await action.Should().NotThrowAsync();
         }
 
         [Fact(DisplayName = "RunPreMiddleware should run middleware when one middleware")]
@@ -124,13 +124,13 @@ namespace WorkflowCore.UnitTests.Services
         }
 
         [Fact(DisplayName = "RunPostMiddleware should run nothing when no middleware")]
-        public void RunPostMiddleware_should_run_nothing_when_no_middleware()
+        public async Task RunPostMiddleware_should_run_nothing_when_no_middleware()
         {
             // Act
             Func<Task> action = async () => await Runner.RunPostMiddleware(Workflow, Definition);
 
             // Assert
-            action.ShouldNotThrow();
+            await action.Should().NotThrowAsync();
         }
 
         [Fact(DisplayName = "RunPostMiddleware should run middleware when one middleware")]
@@ -239,13 +239,13 @@ namespace WorkflowCore.UnitTests.Services
         }
 
         [Fact(DisplayName = "RunExecuteMiddleware should run nothing when no middleware")]
-        public void RunExecuteMiddleware_should_run_nothing_when_no_middleware()
+        public async Task RunExecuteMiddleware_should_run_nothing_when_no_middleware()
         {
             // Act
             Func<Task> action = async () => await Runner.RunExecuteMiddleware(Workflow, Definition);
 
             // Assert
-            action.ShouldNotThrow();
+            await action.Should().NotThrowAsync();
         }
 
         [Fact(DisplayName = "RunExecuteMiddleware should run middleware when one middleware")]

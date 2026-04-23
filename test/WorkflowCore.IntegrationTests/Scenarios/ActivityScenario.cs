@@ -5,6 +5,7 @@ using Xunit;
 using FluentAssertions;
 using System.Linq;
 using WorkflowCore.Testing;
+using System.Threading.Tasks;
 
 namespace WorkflowCore.IntegrationTests.Scenarios
 {
@@ -47,10 +48,10 @@ namespace WorkflowCore.IntegrationTests.Scenarios
         }
 
         [Fact]
-        public void Scenario()
+        public async Task Scenario()
         {
             var workflowId = StartWorkflow(new MyDataClass { ActivityInput = new ActivityInput { Value1 = "a", Value2 = 1 } });
-            var activity = Host.GetPendingActivity("act-1", "worker1", TimeSpan.FromSeconds(30)).Result;
+            var activity = await Host.GetPendingActivity("act-1", "worker1", TimeSpan.FromSeconds(30));
 
             if (activity != null)
             {

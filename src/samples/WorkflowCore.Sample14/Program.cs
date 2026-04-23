@@ -28,8 +28,8 @@ namespace WorkflowCore.Sample14
             IServiceCollection services = new ServiceCollection();
             services.AddLogging();
             //services.AddWorkflow();
-            services.AddWorkflow(x => x.UseSqlServer(@"Server=.\SQLEXPRESS;Database=WorkflowCore;Trusted_Connection=True;", true, true));
-            
+            services.AddWorkflow(x => x.UsePostgreSQL(@"Server=127.0.0.1;Port=5432;Database=workflow;User Id=postgres;", true, true));
+
             var serviceProvider = services.BuildServiceProvider();
 
             return serviceProvider;

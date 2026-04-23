@@ -96,7 +96,7 @@ namespace WorkflowCore.UnitTests.Services
         }
 
         [Fact(DisplayName = "ExecuteStep should bubble up exceptions in middleware")]
-        public void ExecuteStep_should_bubble_up_exceptions_in_middleware()
+        public async Task ExecuteStep_should_bubble_up_exceptions_in_middleware()
         {
             // Arrange
             var middleware1 = BuildStepMiddleware(1);
@@ -111,8 +111,8 @@ namespace WorkflowCore.UnitTests.Services
             Func<Task<ExecutionResult>> action = async () => await Runner.ExecuteStep(Context, Body);
 
             // Assert
-            action
-                .ShouldThrow<ApplicationException>()
+            await action
+                .Should().ThrowAsync<ApplicationException>()
                 .WithMessage("Failed");
         }
 

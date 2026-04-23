@@ -1,10 +1,11 @@
-﻿using System;
+﻿using FluentAssertions;
+using System;
 using System.Collections.Generic;
-using FluentAssertions;
-using Xunit;
+using System.Threading.Tasks;
 using WorkflowCore.Interface;
 using WorkflowCore.Models;
 using WorkflowCore.Models.Search;
+using Xunit;
 
 namespace WorkflowCore.IntegrationTests
 {
@@ -79,7 +80,7 @@ namespace WorkflowCore.IntegrationTests
 
 
         [Fact]
-        public async void should_search_on_reference()
+        public async Task should_search_on_reference()
         {
             var result1 = await Subject.Search("ref1", 0, 10);
             var result2 = await Subject.Search("ref2", 0, 10);
@@ -94,7 +95,7 @@ namespace WorkflowCore.IntegrationTests
         }
         
         [Fact]
-        public async void should_search_on_custom_data()
+        public async Task should_search_on_custom_data()
         {
             var result = await Subject.Search("dog fox", 0, 10);
 
@@ -104,7 +105,7 @@ namespace WorkflowCore.IntegrationTests
         }
 
         [Fact]
-        public async void should_filter_on_custom_data()
+        public async Task should_filter_on_custom_data()
         {
             var result = await Subject.Search(null, 0, 10, ScalarFilter.Equals<DataObject>(x => x.Value3, 7));
 
@@ -114,7 +115,7 @@ namespace WorkflowCore.IntegrationTests
         }
 
         [Fact]
-        public async void should_filter_on_alt_custom_data_with_conflicting_names()
+        public async Task should_filter_on_alt_custom_data_with_conflicting_names()
         {
             var result1 = await Subject.Search(null, 0, 10, ScalarFilter.Equals<AltDataObject>(x => x.Value1, 9));
             var result2 = await Subject.Search(null, 0, 10, DateRangeFilter.Between<AltDataObject>(x => x.Value2, new DateTime(1999, 12, 31), new DateTime(2000, 1, 2)));
@@ -124,7 +125,7 @@ namespace WorkflowCore.IntegrationTests
         }
 
         [Fact]
-        public async void should_filter_on_reference()
+        public async Task should_filter_on_reference()
         {
             var result = await Subject.Search(null, 0, 10, ScalarFilter.Equals(x => x.Reference, "ref2"));
 
@@ -134,7 +135,7 @@ namespace WorkflowCore.IntegrationTests
         }
 
         [Fact]
-        public async void should_filter_on_status()
+        public async Task should_filter_on_status()
         {
             var result = await Subject.Search(null, 0, 10, StatusFilter.Equals(WorkflowStatus.Runnable));
 
@@ -143,7 +144,7 @@ namespace WorkflowCore.IntegrationTests
         }
 
         [Fact]
-        public async void should_filter_on_date_range()
+        public async Task should_filter_on_date_range()
         {
             var start = new DateTime(2000, 1, 1);
             var end = new DateTime(2015, 1, 1);

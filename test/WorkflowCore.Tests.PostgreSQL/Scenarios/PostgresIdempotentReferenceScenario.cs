@@ -55,7 +55,7 @@ namespace WorkflowCore.Tests.PostgreSQL.Scenarios
             wf.Should().NotBeNull();
             wf.Id.Should().Be(workflowId);
 
-            action1.ShouldThrow<WorkflowExistsException>();
+            await action1.Should().ThrowAsync<WorkflowExistsException>();
         }
     }
 }

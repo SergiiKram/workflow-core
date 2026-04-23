@@ -2,7 +2,7 @@
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using WorkflowCore.Interface;
-using Nest;
+//using Nest;
 using WorkflowCore.Models.Search;
 
 namespace ScratchPad
@@ -53,7 +53,7 @@ namespace ScratchPad
             {
                 //var ddbConfig = new AmazonDynamoDBConfig() { RegionEndpoint = RegionEndpoint.USWest2 };
                 //cfg.UseAwsDynamoPersistence(new EnvironmentVariablesAWSCredentials(), ddbConfig, "elastic");
-                cfg.UseElasticsearch(new ConnectionSettings(new Uri("http://localhost:9200")), "workflows");
+                //cfg.UseElasticsearch(new ConnectionSettings(new Uri("http://localhost:9200")), "workflows");
                 //cfg.UseAwsSimpleQueueService(new EnvironmentVariablesAWSCredentials(), new AmazonSQSConfig() { RegionEndpoint = RegionEndpoint.USWest2 });
                 //cfg.UseAwsDynamoLocking(new EnvironmentVariablesAWSCredentials(), new AmazonDynamoDBConfig() { RegionEndpoint = RegionEndpoint.USWest2 }, "workflow-core-locks");
             });

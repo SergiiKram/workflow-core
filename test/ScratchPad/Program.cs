@@ -17,7 +17,7 @@ namespace ScratchPad
 
             //start the workflow host
             var host = serviceProvider.GetService<IWorkflowHost>();
-            var loader = serviceProvider.GetService<IDefinitionLoader>();
+            //var loader = serviceProvider.GetService<IDefinitionLoader>();
             var activityController = serviceProvider.GetService<IActivityController>();
             host.RegisterWorkflow<Test01Workflow, WfData>();
             //loader.LoadDefinition(Properties.Resources.HelloWorld, Deserializers.Json);
@@ -61,7 +61,7 @@ namespace ScratchPad
             
             services.AddWorkflow(cfg =>
             {
-                cfg.UseSqlServer(@"Server=.;Database=WorkflowCore;Trusted_Connection=True;", true, true);
+                cfg.UsePostgreSQL(@"Server=127.0.0.1;Port=5432;Database=workflow;User Id=postgres;", true, true);
                 cfg.UseMaxConcurrentWorkflows(100);
                 //var ddbConfig = new AmazonDynamoDBConfig() { RegionEndpoint = RegionEndpoint.USWest2 };
                 //cfg.UseAwsDynamoPersistence(new EnvironmentVariablesAWSCredentials(), ddbConfig, "elastic");
@@ -69,7 +69,7 @@ namespace ScratchPad
                 //cfg.UseAwsSimpleQueueService(new EnvironmentVariablesAWSCredentials(), new AmazonSQSConfig() { RegionEndpoint = RegionEndpoint.USWest2 });
                 //cfg.UseAwsDynamoLocking(new EnvironmentVariablesAWSCredentials(), new AmazonDynamoDBConfig() { RegionEndpoint = RegionEndpoint.USWest2 }, "workflow-core-locks");
             });
-            services.AddWorkflowDSL();
+            //services.AddWorkflowDSL();
 
             
             var serviceProvider = services.BuildServiceProvider();

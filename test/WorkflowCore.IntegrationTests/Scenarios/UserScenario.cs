@@ -1,10 +1,11 @@
-﻿using System;
+﻿using FluentAssertions;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using WorkflowCore.Interface;
 using WorkflowCore.Models;
-using Xunit;
-using FluentAssertions;
-using System.Linq;
 using WorkflowCore.Testing;
+using Xunit;
 
 namespace WorkflowCore.IntegrationTests.Scenarios
 {
@@ -37,7 +38,7 @@ namespace WorkflowCore.IntegrationTests.Scenarios
         }
 
         [Fact]
-        public void Scenario()
+        public async Task Scenario()
         {
             var workflowId = StartWorkflow(null);
             var counter = 0;
@@ -50,7 +51,7 @@ namespace WorkflowCore.IntegrationTests.Scenarios
 
             var openItems1 = Host.GetOpenUserActions(workflowId).ToList();
 
-            Host.PublishUserAction(openItems1.First().Key, "user1", "yes").Wait();
+            await Host.PublishUserAction(openItems1.First().Key, "user1", "yes");
 
             WaitForWorkflowToComplete(workflowId, TimeSpan.FromSeconds(30));
 

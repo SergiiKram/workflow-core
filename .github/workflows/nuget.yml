@@ -14,9 +14,8 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: | 
-          3.1.x
-          6.0.x
           8.0.x
+          10.0.x
     - name: Setup NuGet
       uses: NuGet/setup-nuget@v1.0.5
     - name: Restore dependencies
@@ -29,10 +28,10 @@ jobs:
       run: dotnet test test/WorkflowCore.IntegrationTests --configuration Release --no-build --verbosity normal -p:ParallelizeTestCollections=false
     - name: PostgreSQL Tests
       run: dotnet test test/WorkflowCore.Tests.PostgreSQL --configuration Release --no-build --verbosity normal -p:ParallelizeTestCollections=false
+    - name: Redis Tests
+      run: dotnet test test/WorkflowCore.Tests.Redis --configuration Release --no-build --verbosity normal -p:ParallelizeTestCollections=false
     - name: Pack WorkflowCore
       run: dotnet pack src/WorkflowCore --configuration Release --no-build
-    - name: Pack WorkflowCore.DSL
-      run: dotnet pack src/WorkflowCore.DSL --configuration Release --no-build
     - name: Pack WorkflowCore.Testing
       run: dotnet pack src/WorkflowCore.Testing --configuration Release --no-build
     - name: Pack EntityFramework
