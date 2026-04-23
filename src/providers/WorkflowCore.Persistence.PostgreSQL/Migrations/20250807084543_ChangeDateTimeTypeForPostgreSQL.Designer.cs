@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using WorkflowCore.Persistence.PostgreSQL;
@@ -11,21 +12,15 @@ using WorkflowCore.Persistence.PostgreSQL;
 namespace WorkflowCore.Persistence.PostgreSQL.Migrations
 {
     [DbContext(typeof(PostgresContext))]
-    partial class PostgresPersistenceProviderModelSnapshot : ModelSnapshot
+    [Migration("20250807084543_ChangeDateTimeTypeForPostgreSQL")]
+    partial class ChangeDateTimeTypeForPostgreSQL
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-#if NETSTANDARD2_1
-                .HasAnnotation("ProductVersion", "5.0.1")
-#elif NET6_0  
-                .HasAnnotation("ProductVersion", "7.0.0")
-#elif NET8_0
-                .HasAnnotation("ProductVersion", "9.0.9")
-#else
-                .HasAnnotation("ProductVersion", "9.0.9")
-#endif
+                .HasAnnotation("ProductVersion", "8.0.19")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -341,9 +336,6 @@ namespace WorkflowCore.Persistence.PostgreSQL.Migrations
                         .IsUnique();
 
                     b.HasIndex("NextExecution");
-
-                    b.HasIndex("Reference")
-                        .IsUnique();
 
                     b.ToTable("Workflow", "wfc");
                 });

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <AssemblyTitle>Workflow Core EntityFramework Core Persistence Provider</AssemblyTitle>
@@ -10,7 +10,7 @@
     <PackageProjectUrl>https://github.com/SergiiKram/workflow-core</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/SergiiKram/workflow-core/blob/idempotent-workflow-start/LICENSE.md</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/SergiiKram/workflow-core</RepositoryUrl>    
+    <RepositoryUrl>https://github.com/SergiiKram/workflow-core</RepositoryUrl>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>

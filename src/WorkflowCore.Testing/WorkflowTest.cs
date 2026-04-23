@@ -19,6 +19,7 @@ namespace WorkflowCore.Testing
         protected IEventsPurger EventsPurger;
         protected IPersistenceProvider PersistenceProvider;
         protected List<StepError> UnhandledStepErrors = new List<StepError>();
+        private ServiceProvider _serviceProvider;
 
         protected virtual void Setup()
         {
@@ -27,12 +28,12 @@ namespace WorkflowCore.Testing
             services.AddLogging();
             ConfigureServices(services);
 
-            var serviceProvider = services.BuildServiceProvider();
+            _serviceProvider = services.BuildServiceProvider();
 
-            WorkflowPurger = serviceProvider.GetService<IWorkflowPurger>();
-            EventsPurger = serviceProvider.GetService<IEventsPurger>();
-            PersistenceProvider = serviceProvider.GetService<IPersistenceProvider>();
-            Host = serviceProvider.GetService<IWorkflowHost>();
+            WorkflowPurger = _serviceProvider.GetService<IWorkflowPurger>();
+            EventsPurger = _serviceProvider.GetService<IEventsPurger>();
+            PersistenceProvider = _serviceProvider.GetService<IPersistenceProvider>();
+            Host = _serviceProvider.GetService<IWorkflowHost>();
             Host.RegisterWorkflow<TWorkflow, TData>();
             Host.OnStepError += Host_OnStepError;
             Host.Start();
@@ -134,6 +135,7 @@ namespace WorkflowCore.Testing
         public void Dispose()
         {
             Host.Stop();
+            _serviceProvider?.Dispose();
         }
     }
 
