@@ -12,10 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\WorkflowCore\WorkflowCore.csproj" />
     <ProjectReference Include="..\..\providers\WorkflowCore.Persistence.EntityFramework\WorkflowCore.Persistence.EntityFramework.csproj" />
-    <ProjectReference Include="..\..\providers\WorkflowCore.Persistence.MongoDB\WorkflowCore.Persistence.MongoDB.csproj" />
     <ProjectReference Include="..\..\providers\WorkflowCore.Persistence.PostgreSQL\WorkflowCore.Persistence.PostgreSQL.csproj" />
-    <ProjectReference Include="..\..\providers\WorkflowCore.Persistence.Sqlite\WorkflowCore.Persistence.Sqlite.csproj" />
-    <ProjectReference Include="..\..\providers\WorkflowCore.Persistence.SqlServer\WorkflowCore.Persistence.SqlServer.csproj" />
     <ProjectReference Include="..\..\extensions\WorkflowCore.Users\WorkflowCore.Users.csproj" />
   </ItemGroup>
 

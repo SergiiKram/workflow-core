@@ -14,7 +14,7 @@ namespace WorkflowCore.Sample07
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddLogging();
-            services.AddWorkflow(x => x.UseMongoDB(@"mongodb://localhost:27017", "workflow"));
+            services.AddWorkflow(x => x.UsePostgreSQL(@"Server=127.0.0.1;Port=5432;Database=workflow;User Id=postgres;", true, true));
             services.AddMvc();
         }
 

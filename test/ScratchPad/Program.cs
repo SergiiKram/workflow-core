@@ -61,7 +61,7 @@ namespace ScratchPad
             
             services.AddWorkflow(cfg =>
             {
-                cfg.UseSqlServer(@"Server=.;Database=WorkflowCore;Trusted_Connection=True;", true, true);
+                cfg.UsePostgreSQL(@"Server=127.0.0.1;Port=5432;Database=workflow;User Id=postgres;", true, true);
                 cfg.UseMaxConcurrentWorkflows(100);
                 //var ddbConfig = new AmazonDynamoDBConfig() { RegionEndpoint = RegionEndpoint.USWest2 };
                 //cfg.UseAwsDynamoPersistence(new EnvironmentVariablesAWSCredentials(), ddbConfig, "elastic");

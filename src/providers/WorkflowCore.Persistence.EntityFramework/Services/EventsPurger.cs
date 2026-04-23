@@ -35,33 +35,15 @@ namespace WorkflowCore.Persistence.EntityFramework.Services
                 int deleteEvents = Options.BatchSize;
                 db.Database.SetCommandTimeout(Options.DeleteCommandTimeoutSeconds);
 
-                #if NET6_0_OR_GREATER
-                    while(deleteEvents != 0)
-                    {
-                        deleteEvents = await db.Set<PersistedEvent>()
-                            .Where(x => x.EventTime < olderThanUtc &&
-                                        x.IsProcessed == true)
-                            .Take(Options.BatchSize)
-                            .ExecuteDeleteAsync(cancellationToken);
+                while(deleteEvents != 0)
+                {
+                    deleteEvents = await db.Set<PersistedEvent>()
+                        .Where(x => x.EventTime < olderThanUtc &&
+                                    x.IsProcessed == true)
+                        .Take(Options.BatchSize)
+                        .ExecuteDeleteAsync(cancellationToken);
 
-                    }
-                #else
-                    while (deleteEvents != 0)
-                    {
-                        var events = db.Set<PersistedEvent>()
-                            .Where(x => x.EventTime < olderThanUtc &&
-                                        x.IsProcessed == true)
-                            .Take(Options.BatchSize);
-                    
-                        deleteEvents = await events.CountAsync();
-                    
-                        if(deleteEvents != 0)
-                        {
-                            db.RemoveRange(events);
-                            await db.SaveChangesAsync(cancellationToken);
-                        }
-                    }  
-                #endif
+                }
             }
         }
 

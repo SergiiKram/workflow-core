@@ -15,7 +15,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\WorkflowCore\WorkflowCore.csproj" />
-    <ProjectReference Include="..\..\providers\WorkflowCore.Persistence.MongoDB\WorkflowCore.Persistence.MongoDB.csproj" />
     <ProjectReference Include="..\..\extensions\WorkflowCore.WebAPI\WorkflowCore.WebAPI.csproj" />
     <ProjectReference Include="..\WorkflowCore.Sample04\WorkflowCore.Sample04.csproj" />
     <ProjectReference Include="..\WorkflowCore.Sample03\WorkflowCore.Sample03.csproj" />

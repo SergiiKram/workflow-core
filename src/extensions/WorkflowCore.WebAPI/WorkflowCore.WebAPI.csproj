@@ -3,7 +3,7 @@
   <PropertyGroup>
     <AssemblyTitle>Workflow Core REST API</AssemblyTitle>
     <Authors>Daniel Gerlag</Authors>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
     <AssemblyName>WorkflowCore.WebAPI</AssemblyName>
     <PackageId>WorkflowCore.WebAPI</PackageId>
     <PackageTags>workflow;.NET;Core;state machine;WorkflowCore;REST;API</PackageTags>
