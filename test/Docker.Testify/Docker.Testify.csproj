@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <PackageReference Include="Docker.DotNet" Version="3.125.5" />
+    <PackageReference Include="Docker.DotNet" Version="3.125.15" />
   </ItemGroup>
 </Project>
