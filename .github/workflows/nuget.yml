@@ -30,8 +30,6 @@ jobs:
       run: dotnet test test/WorkflowCore.Tests.PostgreSQL --configuration Release --no-build --verbosity normal -p:ParallelizeTestCollections=false
     - name: Pack WorkflowCore
       run: dotnet pack src/WorkflowCore --configuration Release --no-build
-    - name: Pack WorkflowCore.DSL
-      run: dotnet pack src/WorkflowCore.DSL --configuration Release --no-build
     - name: Pack WorkflowCore.Testing
       run: dotnet pack src/WorkflowCore.Testing --configuration Release --no-build
     - name: Pack EntityFramework
