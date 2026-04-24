@@ -17,7 +17,7 @@ namespace ScratchPad
 
             //start the workflow host
             var host = serviceProvider.GetService<IWorkflowHost>();
-            var loader = serviceProvider.GetService<IDefinitionLoader>();
+            //var loader = serviceProvider.GetService<IDefinitionLoader>();
             var activityController = serviceProvider.GetService<IActivityController>();
             host.RegisterWorkflow<Test01Workflow, WfData>();
             //loader.LoadDefinition(Properties.Resources.HelloWorld, Deserializers.Json);
@@ -69,7 +69,7 @@ namespace ScratchPad
                 //cfg.UseAwsSimpleQueueService(new EnvironmentVariablesAWSCredentials(), new AmazonSQSConfig() { RegionEndpoint = RegionEndpoint.USWest2 });
                 //cfg.UseAwsDynamoLocking(new EnvironmentVariablesAWSCredentials(), new AmazonDynamoDBConfig() { RegionEndpoint = RegionEndpoint.USWest2 }, "workflow-core-locks");
             });
-            services.AddWorkflowDSL();
+            //services.AddWorkflowDSL();
 
             
             var serviceProvider = services.BuildServiceProvider();
