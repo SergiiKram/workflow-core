@@ -16,11 +16,11 @@ Additional changes include:
 - `EventsPurger` to delete old events from the database and batching for `WorkflowPurger`
 - improved OpenTelemetry tracebility, i.e. linking steps to the parent workflow
 - sequential GUIDs (NewId library) for entities for better database performance
-- support for .NET 8
+- support for .NET 8 and .NET 10
 
 **Example:**
 ```xml
-<PackageReference Include="SergiiKram.WorkflowCore.Persistence.PostgreSQL" Version="3.9.0.8" />
+<PackageReference Include="SergiiKram.WorkflowCore.Persistence.PostgreSQL" Version="3.9.0.9" />
 ```
 
 ```cs
