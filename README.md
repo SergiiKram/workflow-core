@@ -20,7 +20,7 @@ Additional changes include:
 
 **Example:**
 ```xml
-<PackageReference Include="SergiiKram.WorkflowCore.Persistence.PostgreSQL" Version="3.9.0.9" />
+<PackageReference Include="SergiiKram.WorkflowCore.Persistence.PostgreSQL" Version="3.9.0.10" />
 ```
 
 ```cs

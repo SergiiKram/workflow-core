@@ -70,6 +70,54 @@ namespace WorkflowCore.Persistence.PostgreSQL
             builder.Property(x => x.PersistenceId).ValueGeneratedOnAdd();
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<PersistedWorkflow>(x =>
+            {
+                x.Property(p => p.CompleteTime)
+                 .HasColumnType("timestamp with time zone");
+
+                x.Property(p => p.CreateTime)
+                 .HasColumnType("timestamp with time zone");
+            });
+
+            modelBuilder.Entity<PersistedExecutionPointer>(x =>
+            {
+                x.Property(p => p.SleepUntil)
+                 .HasColumnType("timestamp with time zone");
+
+                x.Property(p => p.StartTime)
+                 .HasColumnType("timestamp with time zone");
+
+                x.Property(p => p.EndTime)
+                 .HasColumnType("timestamp with time zone");
+
+            });
+
+            modelBuilder.Entity<PersistedExecutionError>(x =>
+            {
+                x.Property(p => p.ErrorTime)
+                 .HasColumnType("timestamp with time zone");
+
+            });
+
+            modelBuilder.Entity<PersistedSubscription>(x =>
+            {
+                x.Property(p => p.SubscribeAsOf)
+                 .HasColumnType("timestamp with time zone");
+
+                x.Property(p => p.ExternalTokenExpiry)
+                 .HasColumnType("timestamp with time zone");
+            });
+
+            modelBuilder.Entity<PersistedEvent>(
+                x => x.Property(x => x.EventTime)
+                .HasColumnType("timestamp with time zone")
+            );
+        }
+
         public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = new CancellationToken())
         {
             try

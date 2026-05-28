@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using WorkflowCore.Persistence.PostgreSQL;
@@ -11,17 +12,15 @@ using WorkflowCore.Persistence.PostgreSQL;
 namespace WorkflowCore.Persistence.PostgreSQL.Migrations
 {
     [DbContext(typeof(PostgresContext))]
-    partial class PostgresPersistenceProviderModelSnapshot : ModelSnapshot
+    [Migration("20250807084543_ChangeDateTimeTypeForPostgreSQL")]
+    partial class ChangeDateTimeTypeForPostgreSQL
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-#if NET8_0
-                .HasAnnotation("ProductVersion", "5.0.8")
-#else
-                .HasAnnotation("ProductVersion", "10.0.8")
-#endif
+                .HasAnnotation("ProductVersion", "8.0.19")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -33,7 +32,7 @@ namespace WorkflowCore.Persistence.PostgreSQL.Migrations
                         .HasColumnType("bigint");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("PersistenceId"));
-                    
+
                     b.Property<string>("EventData")
                         .HasColumnType("text");
 
@@ -337,9 +336,6 @@ namespace WorkflowCore.Persistence.PostgreSQL.Migrations
                         .IsUnique();
 
                     b.HasIndex("NextExecution");
-
-                    b.HasIndex("Reference")
-                        .IsUnique();
 
                     b.ToTable("Workflow", "wfc");
                 });
