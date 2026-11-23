@@ -4,7 +4,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-and-publish:
+    permissions:
+      id-token: write  # enable GitHub OIDC token issuance for this job
 
     runs-on: ubuntu-latest
 
@@ -39,5 +41,11 @@ jobs:
       run: dotnet pack src/providers/WorkflowCore.Persistence.PostgreSQL --configuration Release --no-build
     - name: Pack Redis
       run: dotnet pack src/providers/WorkflowCore.Providers.Redis --configuration Release --no-build
+    # Get a short-lived NuGet API key
+    - name: NuGet login (OIDC → temp API key)
+      uses: NuGet/login@v1
+      id: login
+      with:
+        user: sergiikram # Recommended: use a secret like ${{ secrets.NUGET_USER }} for your nuget.org username (profile name), NOT your email addres
     - name: Publish
-      run: dotnet nuget push "**/*.nupkg" --source 'https://api.nuget.org/v3/index.json' --api-key ${{secrets.NUGET_API_KEY}}
+      run: dotnet nuget push "**/*.nupkg" --source 'https://api.nuget.org/v3/index.json' --api-key ${{steps.login.outputs.NUGET_API_KEY}}
